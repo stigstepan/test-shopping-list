@@ -1,0 +1,6 @@
+/build
+/ext
+bootstrap.*
+classic.json*
+.sencha
+build.bat
