@@ -13,7 +13,9 @@ Ext.define('SL.widget.ItemsList', {
     cls: 'large-font-grid',
 
 	viewConfig: {
-		stripeRows: true
+		stripeRows: true,
+		enableTextSelection: true,
+		markDirty: false		
 	},
 
 	plugins: {
@@ -122,23 +124,29 @@ Ext.define('SL.widget.ItemsListController', {
 	alias: 'controller.sl-items-grid-controller',
 
 	addItem: function () {
-		const view = this.getView(), store = view.getStore();
+		const me = this, view = me.getView(), store = view.getStore();
 
 		const record = store.add({name: '', count: 1, units: 'шт'});
 		view.getSelectionModel().select(record);
 		view.getView().focusRow(record[0]);
 
 		//emulate click on 'name' cell
+		me.updateLocalStorageData();
+
 	},
 
-	removeItem: function () {
-		const view = this.getView(), store = view.getStore();
-		// remove item
+	removeItem: function (tv, rowIndex, colIndex, item, e, record, row) {
+		const me = this, view = me.getView(), store = view.getStore();
+
+		store.remove(record);
+
+		me.updateLocalStorageData();
 	},
 
 	onCellEdit: function (editor, context) {
-		const data = context.record.data;
-		// update data in localStorage
+		const me = this;
+		// const data = context.record.data;
+		me.updateLocalStorageData();
 	},
 
 	showAppInfo: function () {
@@ -173,5 +181,28 @@ Ext.define('SL.widget.ItemsListController', {
 			}
 		});
 		view.appInfoWnd.show();
+	},
+
+	updateLocalStorageData: function () {
+		const items = this.view.store.data.items;
+		const formatedData = items.map(function (item) {
+			const obj = {};
+			for (d in item.data) {
+				if (!Object.prototype.hasOwnProperty.call(item.data, d)) { continue; }
+				if (d == 'id') { continue; }
+
+				obj[d] = item.data[d];
+			}
+			return obj;
+		});
+
+		let formatedStr = ''
+		try {
+			formatedStr = JSON.stringify(formatedData);
+		} catch (e) {
+			console.error(e.stack);
+		}
+
+		// set localStorage data
 	}
 });
