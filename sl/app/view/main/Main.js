@@ -3,25 +3,38 @@
  * "mainView" property. That setting automatically applies the "viewport"
  * plugin causing this view to become the body element (i.e., the viewport).
  *
+ * 2021.
  * @author Stepan Ignatov.
  */
 Ext.define('SL.view.main.Main', {
     extend: 'Ext.panel.Panel',
     xtype: 'app-main',
-
+    referenceHolder: true,
+    
     requires: [
-        'SL.view.main.MainController'
+        'SL.view.main.MainController',
+        'SL.widget.ListGrid',
+        'SL.widget.ItemsList'
     ],
 
     controller: 'main',
 
-    dockedItems: [{
-        xtype: 'toolbar',
-        dock: 'top',
-        items: []
-    }],
+    // tbar: [{
+    //     text: 'Доб. список',
+    //     handler: 'addList'
+    // }],
+    layout: 'border',
 
     items: [{
-        html: 'lorem ipsum'
-    }]
+        width: 300,
+        region: 'west',
+        title: 'Списки покупок',
+        split: true,
+        collapsible: true,
+        xtype: 'sl-list-grid'
+    }, {
+        region: 'center',
+        // margin: 20,
+        xtype: 'sl-items-grid'
+    } ]
 });
