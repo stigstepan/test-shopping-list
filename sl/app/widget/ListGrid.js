@@ -44,9 +44,9 @@ Ext.define('SL.widget.ListGrid', {
 		}
 	}],
 
-	tbar: [{
+	tbar: ['->', {
         text: 'Добавить',
-        iconCls: 'fa fa-plus'
+        iconCls: 'x-fa fa-plus'
     }],
 
 	afterRender: function () {
