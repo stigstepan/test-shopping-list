@@ -70,7 +70,6 @@ Ext.define('SL.widget.ItemsList', {
 		flex: 1,
 		editor: {
 			xtype: 'combo',
-			// width: 440,
 			displayField: 'name',
 			valueField: 'name',
 			editable: false,
@@ -79,6 +78,15 @@ Ext.define('SL.widget.ItemsList', {
 				data: [{name: 'шт'}, {name: 'кг'}, {name: 'л'}, {name: 'бан'}]
 			}
 		}
+	}, {
+		xtype: 'actioncolumn',
+		width: 40,
+		sortable: false,
+		draggable: false,
+		menuDisabled: true,
+		iconCls: 'x-fa fa-minus red',
+		tooltip: 'Удалить продукт',
+		handler: 'removeItem'
 	}],
 
 	afterRender: function () {
@@ -104,9 +112,6 @@ Ext.define('SL.widget.ItemsList', {
 		const me = this, store = me.getStore();
 		if (!Ext.isArray(data)) { data = []; }
 
-		// data.push({
-		// 	name: null, count: null, units: '+'
-		// })
 
 		store.loadData(data);
 	}
@@ -124,6 +129,11 @@ Ext.define('SL.widget.ItemsListController', {
 		view.getView().focusRow(record[0]);
 
 		//emulate click on 'name' cell
+	},
+
+	removeItem: function () {
+		const view = this.getView(), store = view.getStore();
+		// remove item
 	},
 
 	onCellEdit: function (editor, context) {

@@ -1,0 +1,19 @@
+/*
+ * This file contains styling for the Main view.
+ *
+ * 2021.
+ * @author Stepan Ignatov.
+ *
+ */
+
+.x-grid-cell-inner {
+    font: 300 16px/19px 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana, sans-serif;
+}
+
+.large-font-grid .x-column-header {
+    font: 400 16px/19px 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana, sans-serif
+}
+
+.red {
+    color: rgb(209, 23, 23) !important;
+}
