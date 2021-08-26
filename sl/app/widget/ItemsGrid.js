@@ -9,10 +9,12 @@
 Ext.define('SL.widget.ItemsList', {
 	extend: 'Ext.grid.Panel',
 	xtype: 'sl-items-grid',
-	controller: 'sl-items-grid-controller',
+	id: 'sl-items-grid',
+	referenceHolder: true,
+
     cls: 'large-font-grid',
 
-	referenceHolder: true,
+	controller: 'sl-items-grid-controller',
 
 	viewConfig: {
 		stripeRows: true,
@@ -53,6 +55,10 @@ Ext.define('SL.widget.ItemsList', {
 			}
 		}
     }, '->', {
+		text: 'Сортировать по имени',
+		iconCls: 'x-fa fa-sort-alpha-asc',
+		handler: 'sortItems'
+	}, {
 		text: 'Добавить',
 		iconCls: 'x-fa fa-plus',
 		handler: 'addItem'
@@ -67,6 +73,7 @@ Ext.define('SL.widget.ItemsList', {
 
 	columns: [{
 		dataIndex: 'name',
+		sortable: false,
 		text: 'Имя',
 		flex: 6,
 		editor: {
@@ -74,6 +81,7 @@ Ext.define('SL.widget.ItemsList', {
 		}
 	}, {
 		dataIndex: 'count',
+		sortable: false,
 		text: 'Количество',
 		flex: 1,
 		editor: {
@@ -84,6 +92,7 @@ Ext.define('SL.widget.ItemsList', {
 		},
 	}, {
 		dataIndex: 'units',
+		sortable: false,
 		text: 'Единицы измерения',
 		flex: 1,
 		editor: {
@@ -157,6 +166,18 @@ Ext.define('SL.widget.ItemsListController', {
 		store.remove(record);
 
 		me.updateLocalStorageData();
+	},
+
+	sortItems: function () {
+		const store = this.view.store;
+		const sortedData = store.data.items.sort(function (a, b) {
+			if (a.data.name > b.data.name) { return 1; }
+			if (a.data.name < b.data.name) { return -1; }
+			if (a.data.name == b.data.name) { return 0; }
+		});
+		store.loadData(sortedData);
+
+		this.updateLocalStorageData();
 	},
 
 	searchItem: function () {
