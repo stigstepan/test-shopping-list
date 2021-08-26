@@ -12,10 +12,15 @@ Ext.define('SL.widget.ItemsList', {
 	controller: 'sl-items-grid-controller',
     cls: 'large-font-grid',
 
+	referenceHolder: true,
+
 	viewConfig: {
 		stripeRows: true,
-		enableTextSelection: true,
-		markDirty: false		
+		markDirty: false,
+		plugins: [{
+            ptype: 'gridviewdragdrop',
+            dragText: 'Перенести'
+        }]	
 	},
 
 	plugins: {
@@ -29,9 +34,24 @@ Ext.define('SL.widget.ItemsList', {
 	},
 
 	tbar: [{
+		iconCls: 'x-fa fa-search',
+		style: 'background-color: white;border: none;',
+		handler: 'searchItem'
+	}, {
 		xtype: 'textfield',
 		width: 400,
-		emptyText: 'Найти'
+		reference: 'searchfield-ref',
+		emptyText: 'Найти',
+		listeners : {
+			render: function(cmp) {
+				const ctrl = cmp.up('grid').controller;
+				cmp.getEl().on('keypress', function(e) {
+					if (e.getKey() == e.ENTER) {
+						ctrl.searchItem();
+					}
+				});
+			}
+		}
     }, '->', {
 		text: 'Добавить',
 		iconCls: 'x-fa fa-plus',
@@ -42,11 +62,7 @@ Ext.define('SL.widget.ItemsList', {
 	}],
 
 	store: {
-		fields: ['name', 'count', 'units'],
-        sorters: [{
-			property: 'name',
-			direction: 'ASC' // or 'DESC'
-		}],
+		fields: ['name', 'count', 'units']
 	},
 
 	columns: [{
@@ -143,6 +159,10 @@ Ext.define('SL.widget.ItemsListController', {
 		me.updateLocalStorageData();
 	},
 
+	searchItem: function () {
+
+	},
+
 	onCellEdit: function (editor, context) {
 		const me = this;
 		// const data = context.record.data;
@@ -165,7 +185,7 @@ Ext.define('SL.widget.ItemsListController', {
 
 		view.appInfoWnd = Ext.create('Ext.window.Window', {
 			title: 'Справка',
-			width: 300,
+			width: 400,
 			height: 500,
 			modal: false,
 			resizable: false,
