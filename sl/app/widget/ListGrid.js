@@ -14,7 +14,16 @@ Ext.define('SL.widget.ListGrid', {
 
 	viewConfig: {
 		stripeRows: true,
-		markDirty: false
+		markDirty: false,
+		plugins: [{
+            ptype: 'gridviewdragdrop',
+            dragText: 'Перенести'
+        }],
+		listeners: {
+			drop: function(node, data, dropRec, dropPosition) {
+				this.up('grid').controller.sortStorageData();
+			}
+		}
 	},
 
 	plugins: {
@@ -29,7 +38,7 @@ Ext.define('SL.widget.ListGrid', {
 	},
 
 	store: {
-		fields: ['name']
+		fields: ['id', 'name']
 	},
 
 	columns: [{
@@ -39,9 +48,22 @@ Ext.define('SL.widget.ListGrid', {
         editor: {
 			allowBlank: false
 		}
+	}, {
+		xtype: 'actioncolumn',
+		width: 40,
+		sortable: false,
+		draggable: false,
+		menuDisabled: true,
+		iconCls: 'x-fa fa-minus red',
+		tooltip: 'Удалить список',
+		handler: 'removeList'
 	}],
 
 	tbar: ['->', {
+		text: 'Сортировать по имени',
+		iconCls: 'x-fa fa-sort-alpha-asc',
+		handler: 'sortLists'
+	}, {
         text: 'Добавить',
         iconCls: 'x-fa fa-plus',
 		handler: 'addList',
@@ -77,13 +99,13 @@ Ext.define('SL.widget.ListGrid', {
 		const me = this;
 		if (!Ext.isArray(data)) { data = []; }
 
-		me.controller.updateListData(data);
+		me.controller.setLocalStorageData(data);
 
-		const names = data.map(function (list) {
-			return {name: list.name};
+		const lists = data.map(function (list) {
+			return {id: list.id, name: list.name};
 		});
 
-		me.store.loadData(names);
+		me.store.loadData(lists);
 
 		me.setSelection(me.store.first());
 	}
@@ -94,28 +116,27 @@ Ext.define('SL.widget.ListGridController', {
 	alias: 'controller.sl-list-grid-controller',
 
 	onCellEdit: function (editor, context) {
-		const me = this;
-
-		const newName = context.record.data.name;
-		const prevName = context.record.previousValues.name;
-
-		me.updateListName(prevName, newName);
+		this.updateListName(context.record.data);
 	},
 
 	onListSelect: function (rowmodel, record) {
 		const me = this, view = me.getView();
 
-		const name = record.data.name;
+		const id = record.data.id;
 		const data = me.getLocalStorageData().filter(function (list) {
-			return list.name == name;
+			return list.id == id;
 		})[0];
 
-		view.itemsGrid.setListName(data.name)
-		view.itemsGrid.setData(data.items);
+		const listid = data ? data.id : null;
+		const items = data ? data.items : null;
+
+		view.itemsGrid.setListId(listid)
+		view.itemsGrid.setData(items);
 	},
 
 	getDefaultData: function () {
 		return [{
+			id: '1',
 			name: 'Продукты',
 			items: [
 				{name: 'Хлеб', count: 1, units: 'шт'},
@@ -124,6 +145,7 @@ Ext.define('SL.widget.ListGridController', {
 				{name: 'Пиво', count: 6, units: 'бан'}
 			]
 		}, {
+			id: '2',
 			name: 'Химия',
 			items: [
 				{name: 'Стеклоочиститель', count: 1, units: 'л'},
@@ -131,6 +153,7 @@ Ext.define('SL.widget.ListGridController', {
 				{name: 'Стиральный порошок', count: 5, units: 'кг'}
 			]
 		}, {
+			id: '3',
 			name: 'Машина',
 			items: [
 				{name: 'Покрышки', count: 4, units: 'шт'},
@@ -144,33 +167,46 @@ Ext.define('SL.widget.ListGridController', {
 	addList: function () {
 		const me = this, view = me.getView(), store = view.getStore();
 
-		const empty = {name: '', id: Ext.id(), items: []};
+		const newListName = me.getNewListName();
+		const empty = {name: newListName, id: Ext.id() + (new Date()).valueOf(), items: []};
 		const record = store.add(empty);
+
+		data = me.getLocalStorageData();
+		data.push(empty);
+		me.setLocalStorageData(data);
 
 		view.getSelectionModel().select(record);
 		view.getView().focusRow(record[0]);
 
 		//emulate click on 'name' cell
-
-		data = me.getLocalStorageData();
-		data.push({empty});
-		me.updateListData(data);
 	},
 
-	updateListName: function (prevName, newName) {
-		const me = this;
+	getNewListName: function () {
+		const items = this.view.store.data.items;
+		let count = 0, name, find = false;
+		while(!find) {
+			count++;
+			name = 'Список ' + count;
+			find = items.every(function (item) {
+				return item.data.name != name;
+			});
+		}
+		return name;
+	},
+
+	updateListName: function (info) {
+		const me = this, id = info.id, newName = info.name;
 		const data = me.getLocalStorageData();
 
 		data.some(function (list) {
-			if (list.name == prevName) { 
+			if (list.id == id) { 
 				list.name = newName;
 				return true;
 			}
 			return false;
 		});
 
-		me.updateListData(data);
-		me.view.itemsGrid.setListName(newName);
+		me.setLocalStorageData(data);
 	},
 
 	getLocalStorageData: function () {
@@ -189,11 +225,79 @@ Ext.define('SL.widget.ListGridController', {
 		return result;
 	},
 
-	updateListData: function (data) {
+	setLocalStorageData: function (data) {
 		try {
 			localStorage.setItem('sl-listgrid-data', JSON.stringify(data));
 		} catch (e) {
 			console.error(e.stack);
 		}
+	},
+
+	sortStorageData: function () {
+		const me = this;
+
+		data = me.getLocalStorageData();
+		data.sort(function (first, second) {
+			const firstPos = me.getListPosition(first);
+			const secondPos = me.getListPosition(second);
+			if (firstPos > secondPos) { return 1; }
+			if (firstPos < secondPos) { return -1; }
+			return 0;
+		});
+
+		me.setLocalStorageData(data);	
+	},
+
+	getListPosition: function (list) {
+		const me = this;
+		const storeData = me.getFormatedItems();
+
+		return storeData.indexOf(storeData.find(item => item.id == list.id));
+	},
+
+	getFormatedItems: function () {
+		const me = this, view = me.view;
+
+		const items = view.store.data.items;
+		const result = items.map(function (item) {
+			const res = {};
+			for (d in item.data) {
+				if (!Object.prototype.hasOwnProperty.call(item.data, d)) { continue; }
+
+				res[d] = item.data[d];
+			}
+			return res;
+		});
+
+		return result;
+	},
+
+	sortLists: function () {
+		const store = this.view.store;
+		const sortedData = store.data.items.sort(function (a, b) {
+			if (a.data.name > b.data.name) { return 1; }
+			if (a.data.name < b.data.name) { return -1; }
+			if (a.data.name == b.data.name) { return 0; }
+		});
+		store.loadData(sortedData);
+
+		this.sortStorageData();
+	},
+
+	removeList: function (tv, rowIndex, colIndex, item, e, record, row) {
+		const me = this, view = me.getView(), store = view.getStore();
+
+		data = me.getLocalStorageData();
+		const index = me.getListPosition({id: record.data.id});
+		data.splice(index, 1);
+		me.setLocalStorageData(data);
+
+		store.remove(record);
+
+		const first = store.first();
+		if (!first) { return; }
+
+		view.getSelectionModel().select(first);
+		view.getView().focusRow(first);
 	}
 });

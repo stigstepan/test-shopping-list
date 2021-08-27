@@ -73,7 +73,7 @@ Ext.define('SL.widget.ItemsList', {
 	}],
 
 	store: {
-		fields: ['name', 'count', 'units']
+		fields: ['id', 'name', 'count', 'units']
 	},
 
 	columns: [{
@@ -127,8 +127,8 @@ Ext.define('SL.widget.ItemsList', {
 
 	},
 
-	setListName: function (name) {
-		this.currentListName = name;
+	setListId: function (id) {
+		this.currentListId = id;
 	},
 
 	setData: function (data) {
@@ -150,13 +150,28 @@ Ext.define('SL.widget.ItemsListController', {
 	addItem: function () {
 		const me = this, view = me.getView(), store = view.getStore();
 
-		const record = store.add({name: '', count: 1, units: 'шт'});
+		const newItemName = me.getNewItemName();
+		const emptyItem = {id: Ext.id() + (new Date()).valueOf(), name: newItemName, count: 1, units: 'шт'}
+		const record = store.add(emptyItem);
 		view.getSelectionModel().select(record);
 		view.getView().focusRow(record[0]);
 
 		//emulate click on 'name' cell
 		me.updateLocalStorageData();
 
+	},
+
+	getNewItemName: function () {
+		const items = this.view.store.data.items;
+		let count = 0, name, find = false;
+		while(!find) {
+			count++;
+			name = 'Продукт ' + count;
+			find = items.every(function (item) {
+				return item.data.name != name;
+			});
+		}
+		return name;
 	},
 
 	removeItem: function (tv, rowIndex, colIndex, item, e, record, row) {
@@ -242,11 +257,11 @@ Ext.define('SL.widget.ItemsListController', {
 	},
 
 	updateLocalStorageData: function () {
-		const me = this, name = me.view.currentListName, items = me.getFormatedItems();
+		const me = this, id = me.view.currentListId, items = me.getFormatedItems();
 
 		data = me.getLocalStorageData();
 		data.some(function (list) {
-			if (list.name == name) { 
+			if (list.id == id) { 
 				list.items = items;
 				return true;
 			}
@@ -269,7 +284,6 @@ Ext.define('SL.widget.ItemsListController', {
 			const res = {};
 			for (d in item.data) {
 				if (!Object.prototype.hasOwnProperty.call(item.data, d)) { continue; }
-				if (d == 'id') { continue; }
 
 				res[d] = item.data[d];
 			}
