@@ -22,7 +22,12 @@ Ext.define('SL.widget.ItemsList', {
 		plugins: [{
             ptype: 'gridviewdragdrop',
             dragText: 'Перенести'
-        }]	
+        }],
+		listeners: {
+			drop: function(node, data, dropRec, dropPosition) {
+				this.lookupReferenceHolder().updateLocalStorageData()
+			}
+		}
 	},
 
 	plugins: {
@@ -120,25 +125,19 @@ Ext.define('SL.widget.ItemsList', {
 		const me = this;
 		me.callParent(arguments);
 
-		me.getData();
 	},
 
-	getData: function () {
-		const me = this;
-		// load from local storage
-        // or from file
-		me.setData([
-            {name: 'Хлеб', count: 1, units: 'шт'},
-            {name: 'Помидоры', count: 2, units: 'кг'},
-            {name: 'Огурцы', count: 2, units: 'кг'},
-            {name: 'Пиво', count: 6, units: 'бан'}
-        ]);
+	setListName: function (name) {
+		this.currentListName = name;
 	},
 
 	setData: function (data) {
 		const me = this, store = me.getStore();
-		if (!Ext.isArray(data)) { data = []; }
 
+		if (!Ext.isArray(data)) {
+			store.loadData([]);
+			return;
+		}
 
 		store.loadData(data);
 	}
@@ -224,26 +223,59 @@ Ext.define('SL.widget.ItemsListController', {
 		view.appInfoWnd.show();
 	},
 
+	getLocalStorageData: function () {
+		let result;
+
+		result = localStorage.getItem('sl-listgrid-data');
+		if (!result) { return []; }
+		
+		try {
+			result = JSON.parse(result);
+		} catch (e) {
+			console.error(e.stack);
+			return [];
+		}
+
+		if (!Ext.isArray(result)) { return []; }
+
+		return result;
+	},
+
 	updateLocalStorageData: function () {
-		const items = this.view.store.data.items;
-		const formatedData = items.map(function (item) {
-			const obj = {};
+		const me = this, name = me.view.currentListName, items = me.getFormatedItems();
+
+		data = me.getLocalStorageData();
+		data.some(function (list) {
+			if (list.name == name) { 
+				list.items = items;
+				return true;
+			}
+			return false;
+		});
+
+		try {
+			let strData = JSON.stringify(data);
+			localStorage.setItem('sl-listgrid-data', strData);
+		} catch (e) {
+			console.error(e.stack);
+		}
+	},
+
+	getFormatedItems: function () {
+		const me = this, view = me.view;
+
+		const items = view.store.data.items;
+		const result = items.map(function (item) {
+			const res = {};
 			for (d in item.data) {
 				if (!Object.prototype.hasOwnProperty.call(item.data, d)) { continue; }
 				if (d == 'id') { continue; }
 
-				obj[d] = item.data[d];
+				res[d] = item.data[d];
 			}
-			return obj;
+			return res;
 		});
 
-		let formatedStr = ''
-		try {
-			formatedStr = JSON.stringify(formatedData);
-		} catch (e) {
-			console.error(e.stack);
-		}
-
-		// set localStorage data
+		return result;
 	}
 });
