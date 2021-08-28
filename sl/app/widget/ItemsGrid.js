@@ -131,6 +131,20 @@ Ext.define('SL.widget.ItemsList', {
 		handler: 'removeItem'
 	}],
 
+	afterRender: function () {
+		this.callParent(arguments);
+
+		this.checkFilterValue();
+	},
+
+	checkFilterValue: function () {
+		filterValue = localStorage.getItem('items-filter');
+
+		if (!filterValue) { return; }
+
+		this.lookup('searchfield-ref').setValue(filterValue);
+	},
+
 	setListId: function (id) {
 		this.currentListId = id;
 	},
@@ -202,9 +216,11 @@ Ext.define('SL.widget.ItemsListController', {
 		if (newValue) {
 			me.setNameFilter(newValue);
 			searchBtn.setIconCls('x-fa fa-remove');
+			localStorage.setItem('items-filter', newValue);
 		} else {
 			me.clearFilters();
 			searchBtn.setIconCls('x-fa fa-search');
+			localStorage.setItem('items-filter', '');
 		}
 	},
 
