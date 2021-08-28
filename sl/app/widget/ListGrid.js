@@ -139,27 +139,27 @@ Ext.define('SL.widget.ListGridController', {
 			id: '1',
 			name: 'Продукты',
 			items: [
-				{name: 'Хлеб', count: 1, units: 'шт'},
-				{name: 'Помидоры', count: 2, units: 'кг'},
-				{name: 'Огурцы', count: 2, units: 'кг'},
-				{name: 'Пиво', count: 6, units: 'бан'}
+				{name: 'Хлеб', count: 1, units: 'шт', done: false},
+				{name: 'Помидоры', count: 2, units: 'кг', done: false},
+				{name: 'Огурцы', count: 2, units: 'кг', done: false},
+				{name: 'Пиво', count: 6, units: 'бан', done: false}
 			]
 		}, {
 			id: '2',
 			name: 'Химия',
 			items: [
-				{name: 'Стеклоочиститель', count: 1, units: 'л'},
-				{name: 'Тряпки', count: 2, units: 'шт'},
-				{name: 'Стиральный порошок', count: 5, units: 'кг'}
+				{name: 'Стеклоочиститель', count: 1, units: 'л', done: false},
+				{name: 'Тряпки', count: 2, units: 'шт', done: false},
+				{name: 'Стиральный порошок', count: 5, units: 'кг', done: false}
 			]
 		}, {
 			id: '3',
 			name: 'Машина',
 			items: [
-				{name: 'Покрышки', count: 4, units: 'шт'},
-				{name: 'Незамерзайка', count: 5, units: 'л'},
-				{name: 'Свечи зажигания', count: 12, units: 'шт'},
-				{name: 'Моторное масло', count: 3, units: 'л'}
+				{name: 'Покрышки', count: 4, units: 'шт', done: false},
+				{name: 'Незамерзайка', count: 5, units: 'л', done: false},
+				{name: 'Свечи зажигания', count: 12, units: 'шт', done: false},
+				{name: 'Моторное масло', count: 3, units: 'л', done: false}
 			]
 		}];
 	},

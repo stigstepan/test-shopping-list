@@ -26,6 +26,8 @@ Ext.define('SL.Application', {
     },
 
     init: function () {
+        window.APP_TITLE = 'Менеджер покупок';
+        document.title = window.APP_TITLE;
 		Ext.Msg.buttonText.yes = 'Да';
 		Ext.Msg.buttonText.no = 'Нет';
 	},

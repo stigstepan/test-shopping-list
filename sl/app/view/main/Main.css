@@ -17,3 +17,13 @@
 .red {
     color: rgb(209, 23, 23) !important;
 }
+
+.winabout-summary {
+    margin-top: 10px;
+    padding: 10px;
+    font: 400 16px/19px 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana, sans-serif
+}
+
+.sl-gray-item {
+    background-color: rgb(206, 206, 206);
+}

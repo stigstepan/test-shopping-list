@@ -23,6 +23,9 @@ Ext.define('SL.widget.ItemsList', {
             ptype: 'gridviewdragdrop',
             dragText: 'Перенести'
         }],
+		getRowClass: function (rec) {
+			return rec.get('done') ? 'sl-gray-item' : ''
+		},
 		listeners: {
 			drop: function(node, data, dropRec, dropPosition) {
 				this.lookupReferenceHolder().updateLocalStorageData()
@@ -67,18 +70,27 @@ Ext.define('SL.widget.ItemsList', {
 	}, {
 		iconCls: 'x-fa fa-question-circle-o',
 		handler: 'showAppInfo',
-		tooltip: 'Справка'
+		tooltip: 'О программе'
 	}],
 
-	store: {
-		fields: ['id', 'name', 'count', 'units']
-	},
+	store:  Ext.create('Ext.data.Store', {
+		fields: ['done', 'id', 'name', 'count', 'units'],
+		sorters: ['done']
+	}),
 
 	columns: [{
+		xtype: 'checkcolumn',
+		// text: '<input class="x-grid-checkcolumn" type="checkbox"/>',
+		dataIndex: 'done',
+		width: 50,
+		listeners: {
+			checkchange: 'onItemDone'
+		}
+	}, {
 		dataIndex: 'name',
 		sortable: false,
 		text: 'Имя',
-		flex: 6,
+		flex: 5,
 		editor: {
 			allowBlank: false
 		}
@@ -143,7 +155,7 @@ Ext.define('SL.widget.ItemsListController', {
 		const me = this, view = me.getView(), store = view.getStore();
 
 		const newItemName = me.getNewItemName();
-		const emptyItem = {id: Ext.id() + (new Date()).valueOf(), name: newItemName, count: 1, units: 'шт'}
+		const emptyItem = {id: Ext.id() + (new Date()).valueOf(), name: newItemName, count: 1, units: 'шт', done: false}
 		const record = store.add(emptyItem);
 		view.getSelectionModel().select(record);
 		view.getView().focusRow(record[0]);
@@ -239,7 +251,7 @@ Ext.define('SL.widget.ItemsListController', {
 
 
 		view.appInfoWnd = Ext.create('Ext.window.Window', {
-			title: 'Справка',
+			title: 'О программе',
 			width: 400,
 			height: 500,
 			modal: false,
@@ -247,7 +259,23 @@ Ext.define('SL.widget.ItemsListController', {
 			layout: 'fit',
 			referenceHolder: true,
 
-			items: {html: ''},
+			items: [{
+				xtype: 'panel',
+				grow: true,
+				anchor: '100%',
+				html: 
+					'<div class="winabout-summary">'
+					+ '<span>' + window.APP_TITLE + '</span></br>'
+					+ '<span>Программа предназначена для составления списков покупок</span></br>'
+					+ '<span>test2</span></br>'
+					+ '<span>test1</span></br>'
+					+ '<span>test2</span></br>'
+					+ '<span>test1</span></br>'
+					+ '<span>test2</span></br>'
+					+ '</div>'
+		
+				
+			}],
 
 			listeners: {
 				close: function () {
@@ -311,5 +339,10 @@ Ext.define('SL.widget.ItemsListController', {
 		});
 
 		return result;
+	},
+
+	onItemDone: function (cmp, rowIndex, checked, record, e, eOpts) {
+		record.set('done', checked);
+		this.updateLocalStorageData();
 	}
 });
