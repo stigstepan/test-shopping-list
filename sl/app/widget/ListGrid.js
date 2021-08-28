@@ -56,15 +56,15 @@ Ext.define('SL.widget.ListGrid', {
 		menuDisabled: true,
 		iconCls: 'x-fa fa-minus red',
 		tooltip: 'Удалить список',
-		handler: 'removeList'
+		handler: 'confirmRemoveList'
 	}],
 
 	tbar: ['->', {
-		text: 'Сортировать по имени',
+		tooltip: 'Сортировать по имени',
 		iconCls: 'x-fa fa-sort-alpha-asc',
 		handler: 'sortLists'
 	}, {
-        text: 'Добавить',
+        tooltip: 'Добавить',
         iconCls: 'x-fa fa-plus',
 		handler: 'addList',
     }],
@@ -177,8 +177,6 @@ Ext.define('SL.widget.ListGridController', {
 
 		view.getSelectionModel().select(record);
 		view.getView().focusRow(record[0]);
-
-		//emulate click on 'name' cell
 	},
 
 	getNewListName: function () {
@@ -284,7 +282,20 @@ Ext.define('SL.widget.ListGridController', {
 		this.sortStorageData();
 	},
 
-	removeList: function (tv, rowIndex, colIndex, item, e, record, row) {
+	confirmRemoveList: function (tv, rowIndex, colIndex, item, e, record, row) {
+		const me = this;
+
+		Ext.Msg.confirm('Удаление списка', 'Вы уверены, что хотите удалить список "' + record.data.name + '"?',
+			function (choice) {
+				if (choice === 'yes') {
+					me.removeList(record);
+				}
+			}
+		);
+		
+	},
+
+	removeList: function (record, row) {
 		const me = this, view = me.getView(), store = view.getStore();
 
 		data = me.getLocalStorageData();
@@ -299,5 +310,6 @@ Ext.define('SL.widget.ListGridController', {
 
 		view.getSelectionModel().select(first);
 		view.getView().focusRow(first);
+		
 	}
 });

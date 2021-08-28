@@ -23,5 +23,10 @@ Ext.define('SL.Application', {
                 }
             }
         );
-    }
+    },
+
+    init: function () {
+		Ext.Msg.buttonText.yes = 'Да';
+		Ext.Msg.buttonText.no = 'Нет';
+	},
 });

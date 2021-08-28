@@ -36,28 +36,25 @@ Ext.define('SL.widget.ItemsList', {
 		}
 	},
 
+	multiSelect: true,
+
 	listeners: {
 		edit: 'onCellEdit'
 	},
 
 	tbar: [{
 		iconCls: 'x-fa fa-search',
+		reference: 'search-btn-ref',
 		style: 'background-color: white;border: none;',
-		handler: 'searchItem'
+		handler: 'onClearSearchField'
+		
 	}, {
 		xtype: 'textfield',
 		width: 400,
 		reference: 'searchfield-ref',
 		emptyText: 'Найти',
 		listeners : {
-			render: function(cmp) {
-				const ctrl = cmp.up('grid').controller;
-				cmp.getEl().on('keypress', function(e) {
-					if (e.getKey() == e.ENTER) {
-						ctrl.searchItem();
-					}
-				});
-			}
+			change: 'onSearchFieldChange'
 		}
     }, '->', {
 		text: 'Сортировать по имени',
@@ -69,7 +66,8 @@ Ext.define('SL.widget.ItemsList', {
 		handler: 'addItem'
 	}, {
 		iconCls: 'x-fa fa-question-circle-o',
-		handler: 'showAppInfo'
+		handler: 'showAppInfo',
+		tooltip: 'Справка'
 	}],
 
 	store: {
@@ -121,12 +119,6 @@ Ext.define('SL.widget.ItemsList', {
 		handler: 'removeItem'
 	}],
 
-	afterRender: function () {
-		const me = this;
-		me.callParent(arguments);
-
-	},
-
 	setListId: function (id) {
 		this.currentListId = id;
 	},
@@ -156,9 +148,7 @@ Ext.define('SL.widget.ItemsListController', {
 		view.getSelectionModel().select(record);
 		view.getView().focusRow(record[0]);
 
-		//emulate click on 'name' cell
 		me.updateLocalStorageData();
-
 	},
 
 	getNewItemName: function () {
@@ -194,8 +184,38 @@ Ext.define('SL.widget.ItemsListController', {
 		this.updateLocalStorageData();
 	},
 
-	searchItem: function () {
+	onSearchFieldChange: function (cmp, newValue, oldValue, eOpts) {
+		const me = this, searchBtn = me.view.lookup('search-btn-ref');
 
+		if (newValue) {
+			me.setNameFilter(newValue);
+			searchBtn.setIconCls('x-fa fa-remove');
+		} else {
+			me.clearFilters();
+			searchBtn.setIconCls('x-fa fa-search');
+		}
+	},
+
+	onClearSearchField: function () {
+		this.view.lookup('searchfield-ref').setValue(null);
+	},
+
+	setNameFilter: function (name) {
+		const filters = this.view.store.getFilters();
+
+		filters.add({
+			key: 'name',
+			id: 'name',
+			property: 'name',
+			value: name,
+			type: 'string',
+			anyMatch: true,
+			caseSensitive: false
+		});
+	},
+
+	clearFilters: function () {
+		this.view.store.getFilters().removeAll()
 	},
 
 	onCellEdit: function (editor, context) {

@@ -19,14 +19,10 @@ Ext.define('SL.view.main.Main', {
 
     controller: 'main',
 
-    // tbar: [{
-    //     text: 'Доб. список',
-    //     handler: 'addList'
-    // }],
     layout: 'border',
 
     items: [{
-        width: 300,
+        width: 400,
         region: 'west',
         title: 'Списки покупок',
         split: true,
@@ -34,7 +30,6 @@ Ext.define('SL.view.main.Main', {
         xtype: 'sl-list-grid'
     }, {
         region: 'center',
-        // margin: 20,
         xtype: 'sl-items-grid'
-    } ]
+    }]
 });
