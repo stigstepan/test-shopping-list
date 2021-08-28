@@ -80,7 +80,7 @@ Ext.define('SL.widget.ItemsList', {
 
 	columns: [{
 		xtype: 'checkcolumn',
-		// text: '<input class="x-grid-checkcolumn" type="checkbox"/>',
+		sortable: false,
 		dataIndex: 'done',
 		width: 50,
 		listeners: {
@@ -247,9 +247,7 @@ Ext.define('SL.widget.ItemsListController', {
 	},
 
 	onCellEdit: function (editor, context) {
-		const me = this;
-		// const data = context.record.data;
-		me.updateLocalStorageData();
+		this.updateLocalStorageData();
 	},
 
 	showAppInfo: function () {
