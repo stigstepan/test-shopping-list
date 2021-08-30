@@ -231,7 +231,7 @@ Ext.define('SL.widget.ItemsListController', {
 		} else {
 			me.clearFilters();
 			searchBtn.setIconCls('x-fa fa-search');
-			localStorage.setItem('items-filter', '');
+			localStorage.removeItem('items-filter');
 		}
 	},
 
