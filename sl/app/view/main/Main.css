@@ -24,6 +24,15 @@
     font: 400 16px/19px 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana, sans-serif
 }
 
+.winabout-summary ul {
+    margin: 0px 0px 0px 20px;
+    padding: 0;
+}
+
+.winabout-summary li {
+    margin-bottom: 6px;
+}
+
 .sl-gray-item {
     background-color: rgb(206, 206, 206);
 }

@@ -64,7 +64,7 @@ Ext.define('SL.widget.ListGrid', {
 		iconCls: 'x-fa fa-sort-alpha-asc',
 		handler: 'sortLists'
 	}, {
-        tooltip: 'Добавить',
+        tooltip: 'Создать список',
         iconCls: 'x-fa fa-plus',
 		handler: 'addList',
     }],

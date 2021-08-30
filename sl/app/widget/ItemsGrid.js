@@ -60,16 +60,19 @@ Ext.define('SL.widget.ItemsList', {
 			change: 'onSearchFieldChange'
 		}
     }, '->', {
-		text: 'Сортировать по имени',
+		text: 'По имени',
+		tooltip: 'Сортировать по имени',
 		iconCls: 'x-fa fa-sort-alpha-asc',
 		handler: 'sortItems'
 	}, {
 		text: 'Добавить',
+		tooltip: 'Добавить продукт',
 		iconCls: 'x-fa fa-plus',
 		handler: 'addItem'
 	}, {
 		iconCls: 'x-fa fa-question-circle-o',
 		handler: 'showAppInfo',
+		text: 'О программе',
 		tooltip: 'О программе'
 	}],
 
@@ -81,6 +84,8 @@ Ext.define('SL.widget.ItemsList', {
 	columns: [{
 		xtype: 'checkcolumn',
 		sortable: false,
+		menuDisabled: true,
+		draggable: false,
 		dataIndex: 'done',
 		width: 50,
 		listeners: {
@@ -89,6 +94,8 @@ Ext.define('SL.widget.ItemsList', {
 	}, {
 		dataIndex: 'name',
 		sortable: false,
+		menuDisabled: true,
+		draggable: false,
 		text: 'Имя',
 		flex: 5,
 		editor: {
@@ -97,6 +104,8 @@ Ext.define('SL.widget.ItemsList', {
 	}, {
 		dataIndex: 'count',
 		sortable: false,
+		menuDisabled: true,
+		draggable: false,
 		text: 'Количество',
 		flex: 1,
 		editor: {
@@ -108,6 +117,8 @@ Ext.define('SL.widget.ItemsList', {
 	}, {
 		dataIndex: 'units',
 		sortable: false,
+		menuDisabled: true,
+		draggable: false,
 		text: 'Единицы измерения',
 		flex: 1,
 		editor: {
@@ -279,16 +290,17 @@ Ext.define('SL.widget.ItemsListController', {
 				anchor: '100%',
 				html: 
 					'<div class="winabout-summary">'
-					+ '<span>' + window.APP_TITLE + '</span></br>'
-					+ '<span>Программа предназначена для составления списков покупок</span></br>'
-					+ '<span>test2</span></br>'
-					+ '<span>test1</span></br>'
-					+ '<span>test2</span></br>'
-					+ '<span>test1</span></br>'
-					+ '<span>test2</span></br>'
+					+ '<span>' + window.APP_TITLE + '.</span></br></br>'
+					+ '<span>Программа предназначена для создания списков покупок и управления ими.</span></br></br>'
+					+ '<ul>'
+					+ '<li>Создать список можно нажав на кнопку со знаком "+" в тулбаре левой панели.</li>'
+					+ '<li>Чтобы редактировать имя Списка, сделайте двойной клик по нему.</li>'
+					+ '<li>Добавить продукт в список можно нажав на кнопку "+ Добавить" в тулбаре центральной панели.</li>'
+					+ '<li>Чтобы редактировать Продукт, кликните на ячейку, которую желаете изменить.</li>'
+					+ '<li>Порядок товаров можно менять либо при помощи перетаскивания, либо отсортировав их по алфавиту отдельной кнопкой.</li>'
+					+ '<li>Продукт можно отметить купленным, нажав на квадратное поле в левом столбце.</li>'
+					+ '</ul>'
 					+ '</div>'
-		
-				
 			}],
 
 			listeners: {
