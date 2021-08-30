@@ -353,7 +353,7 @@ Ext.define('SL.widget.ItemsListController', {
 	getFormatedItems: function () {
 		const me = this, view = me.view;
 
-		const items = view.store.data.items;
+		const items = view.store.getDataSource().items;
 		const result = items.map(function (item) {
 			const res = {};
 			for (d in item.data) {
